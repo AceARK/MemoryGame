@@ -2,12 +2,41 @@
 <html>
 <head>
 	<title>Memory Game</title>
+	<meta charset="UTF-8">
+
+	<link rel="stylesheet" href="reset.css">
+	<!-- Latest compiled and minified Bootstrap CSS & JS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+	<link rel="stylesheet" href="style.css">
+	<script src="https://code.jquery.com/jquery.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	<script src="assets/javascript/game.js"></script>
 </head>
 <body>
 	<!-- Title -->
+	<div class="col-xs-12" id="heading">Memory Game</div>
+	
 	<!-- Instructions -->
+	<div class="col-xs-8 col-xs-offset-2 prompts"></div>
+	
 	<!-- Game cards -->
+	<div class="col-xs-12" id="cardArea"></div>
+	
 	<!-- Player area with player stats -->
+	<div class="col-xs-12" id="playerArea">
+		<div class="col-xs-6" id="blue">
+			<!-- Blue token pic -->
+			<div class="col-xs-12 stats" id="blueStats"></div>
+		</div>
+		<div class="col-xs-6" id="red">
+			<!-- Red token pic -->
+			<div class="col-xs-12 stats" id="redStats"></div>
+		</div>
+	</div>
+	
 	<!-- Footer -->
+	<div class="text-center">
+		<h5>&copy; Akhila alias Ace ARK</h5>
+	</div>
 </body>
 </html>
