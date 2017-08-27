@@ -18,63 +18,52 @@
   
 var arrayOfCardObjects = [
 	{
-		"matchId" : "1",
+		"matchId" : 1,
 		"imgSrc" : "https://i.pinimg.com/originals/de/1b/0c/de1b0cc0ea3ae52e6bec6a77006c0fb3.jpg",
 		"visible" : false
 	},
 	{
-		"matchId" : "2",
+		"matchId" : 2,
 		"imgSrc" : "http://cdn2-www.dogtime.com/assets/uploads/gallery/30-impossibly-cute-puppies/impossibly-cute-puppy-8.jpg",
 		"visible" : false
 	},
 	{
-		"matchId" : "3",
+		"matchId" : 3,
 		"imgSrc" : "http://i.dailymail.co.uk/i/pix/2016/02/05/10/30E6DFAA00000578-0-image-a-74_1454669834974.jpg",
 		"visible" : false
 	},
 	{
-		"matchId" : "4",
+		"matchId" : 4,
 		"imgSrc" : "https://static.pexels.com/photos/9264/bird-water-summer-sun.jpg",
 		"visible" : false
 	},
 	{
-		"matchId" : "5",
+		"matchId" : 5,
 		"imgSrc" : "http://orig10.deviantart.net/9893/f/2014/309/4/6/cute_fox_cub_by_thrumyeye-d85cjz2.jpg",
 		"visible" : false
 	},
 	{
-		"matchId" : "6",
+		"matchId" : 6,
 		"imgSrc" : "https://www.saczoo.org/wp-content/uploads/2017/03/Lion-Cubs-6Jan15-Credit-Erik-Bowker-31-760x456.jpg",
 		"visible" : false
 	},
 	{
-		"matchId" : "7",
+		"matchId" : 7,
 		"imgSrc" : "http://www.zooborns.com/.a/6a010535647bf3970b0133f3202a82970b-pi",
 		"visible" : false
 	},
 	{
-		"matchId" : "8",
+		"matchId" : 8,
 		"imgSrc" : "https://s-media-cache-ak0.pinimg.com/236x/fb/24/23/fb24234de5ac249f8fbdcfb40429c853--wolf-puppies-baby-wolves.jpg",
 		"visible" : false
 	}
 ];
-var flipsRemaining = 2;
-var scoreRed = 0;
-var scoreBlue = 0;
-var playerNumber;
-var pairOfCardsFlippedInCurrentRound = [];
-var flippedCardjqueryObjectsPerRound = [];
-var flippedCardsId = [];
-// set up card deck of 16 cards in the beginning
-var cardDeck = prepareCardDeck(arrayOfCardObjects);
-var currentShuffledDeck = [];
-var messagePrompt = "";
+
+var messagePrompt, playerNumber;
 
 $(document).ready(function(event) {
-	// Set up game
-	currentShuffledDeck = setupGame(currentShuffledDeck);
-	// Displaying cards on page
-	displayCardsToPlay();
+	// modularized function containing initial game setup
+	resetGame();
 	// On flipping a card
 	$("#cardArea").on("click", ".cardDiv", function() {
 		console.log($(this));
@@ -160,11 +149,15 @@ function evaluateTurn(cardObj, jqueryObj) {
 		messagePrompt = `${getPlayerColor(playerNumber)} - Flip second card.`;
 		--flipsRemaining;
 		console.log(flipsRemaining);
+		// player's 2 turns have ended
 		if(flipsRemaining === 0) {
+			// disable any more card clicks
+			$(".cardDiv").css('pointer-events', 'none');
+			// Check card match
 			if(checkMatch(pairOfCardsFlippedInCurrentRound[0], pairOfCardsFlippedInCurrentRound[1])) {
 				// Make sure both cards stay open by setting both objects' flags to visible
 				pairOfCardsFlippedInCurrentRound.forEach(function(item, i) {
-					setVisible(item);
+					setVisible(item, true);
 					displayCard(item, flippedCardjqueryObjectsPerRound[i]);
 				});
 				var score = incrementScore();
@@ -183,12 +176,15 @@ function evaluateTurn(cardObj, jqueryObj) {
 				if(visibleCount === 16){
 					endGame();
 				}else {
+					// resuming card's clickabilities
+					$(".cardDiv").css('pointer-events', 'auto');
 					flipsRemaining = 2;
 					pairOfCardsFlippedInCurrentRound = [];
 					flippedCardjqueryObjectsPerRound = [];
 					messagePrompt = `${getPlayerColor(playerNumber)} - Cards match, you get another round.`;
 					$(".prompts").html(messagePrompt);
 				}
+			// if no match
 			}else {
 				// Ensuring the card is shown before hiding and moving on to next player
 				setTimeout(hideCards, 600);
@@ -242,6 +238,8 @@ function togglePlayer() {
 	flipsRemaining = 2;
 	pairOfCardsFlippedInCurrentRound = [];
 	flippedCardjqueryObjectsPerRound = [];
+	// resuming card's clickabilities
+	$(".cardDiv").css('pointer-events', 'auto');
 	messagePrompt = `${getPlayerColor(playerNumber)}'s turn to play. Flip first card.`;
 	$(".prompts").html(messagePrompt);
 }
@@ -255,9 +253,9 @@ function displayCard(cardObj, jqueryObj) {
 	}
 }
 
-// set card object property to visible
-function setVisible(cardObj) {
-	cardObj.visible = true;
+// set card object visible property to boolean specified
+function setVisible(cardObj, boolean) {
+	cardObj.visible = boolean;
 }
 
 // increment score after each match
@@ -271,7 +269,8 @@ function incrementScore() {
 
 function endGame() {
 	console.log("Entering end game function");
-	$(".cardDiv").attr('disabled', true);
+	// disable clicking any more cards when game has ended
+	$(".cardDiv").css('pointer-events', 'none');
 	messagePrompt = "Game over. All cards matched";
 	if(scoreRed > scoreBlue) {
 		winnerDeclaration = "Red player wins!";
@@ -292,21 +291,26 @@ function endGame() {
 	$("#endDialogue").show();
 }
 
-// Todo
+// Restart game
 function resetGame() {
 	$("#cardArea").html("");
 	flipsRemaining = 2;
 	playerNumber = 1;
+	scoreBlue = 0;
+	scoreRed = 0;
 	pairOfCardsFlippedInCurrentRound = [];
 	flippedCardjqueryObjectsPerRound = [];
 	currentShuffledDeck = [];
+	arrayOfCardObjects.forEach(function(item) {
+		setVisible(item, false);
+	});
 	cardDeck = [];
 	cardDeck = prepareCardDeck(arrayOfCardObjects);
-	scoreBlue = 0;
-	scoreRed = 0;
 	$("#redStats").html(scoreRed);
 	$("#blueStats").html(scoreBlue);
 	$(".prompts").html("Welcome! Red player starts the game.");
 	currentShuffledDeck = setupGame(currentShuffledDeck);
+	$("#winMessage").html("");
+	$("#endDialogue").hide();
 	displayCardsToPlay();
 }
