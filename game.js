@@ -20,42 +20,42 @@ var arrayOfCardObjects = [
 	{
 		"matchId" : "1",
 		"imgSrc" : "https://i.pinimg.com/originals/de/1b/0c/de1b0cc0ea3ae52e6bec6a77006c0fb3.jpg",
-		"flipped" : "false"
+		"flipped" : false
 	},
 	{
 		"matchId" : "2",
 		"imgSrc" : "http://cdn2-www.dogtime.com/assets/uploads/gallery/30-impossibly-cute-puppies/impossibly-cute-puppy-8.jpg",
-		"flipped" : "false"
+		"flipped" : false
 	},
 	{
 		"matchId" : "3",
 		"imgSrc" : "http://i.dailymail.co.uk/i/pix/2016/02/05/10/30E6DFAA00000578-0-image-a-74_1454669834974.jpg",
-		"flipped" : "false"
+		"flipped" : false
 	},
 	{
 		"matchId" : "4",
 		"imgSrc" : "https://static.pexels.com/photos/9264/bird-water-summer-sun.jpg",
-		"flipped" : "false"
+		"flipped" : false
 	},
 	{
 		"matchId" : "5",
 		"imgSrc" : "http://orig10.deviantart.net/9893/f/2014/309/4/6/cute_fox_cub_by_thrumyeye-d85cjz2.jpg",
-		"flipped" : "false"
+		"flipped" : false
 	},
 	{
 		"matchId" : "6",
 		"imgSrc" : "https://www.saczoo.org/wp-content/uploads/2017/03/Lion-Cubs-6Jan15-Credit-Erik-Bowker-31-760x456.jpg",
-		"flipped" : "false"
+		"flipped" : false
 	},
 	{
 		"matchId" : "7",
 		"imgSrc" : "http://www.zooborns.com/.a/6a010535647bf3970b0133f3202a82970b-pi",
-		"flipped" : "false"
+		"flipped" : false
 	},
 	{
 		"matchId" : "8",
 		"imgSrc" : "https://s-media-cache-ak0.pinimg.com/236x/fb/24/23/fb24234de5ac249f8fbdcfb40429c853--wolf-puppies-baby-wolves.jpg",
-		"flipped" : "false"
+		"flipped" : false
 	}
 ];
 var turns = 2;
@@ -137,7 +137,7 @@ function cardFlipped(number, cardObject) {
 		messagePrompt = `${getPlayerColor(number)} - Flip second card.`;
 		return messagePrompt;
 	}else {
-		if(checkMatch()) {
+		if(checkMatch(pairOfCardsFlippedInCurrentRound[0], pairOfCardsFlippedInCurrentRound[1])) {
 			turns = 2;
 			messagePrompt = `${getPlayerColor(number)} - Cards match, you get another round.`
 		}else {
@@ -152,8 +152,8 @@ function cardFlipped(number, cardObject) {
 }
 
 
-function checkMatch() {
-	if(pairOfCardsFlippedInCurrentRound[0].matchId === pairOfCardsFlippedInCurrentRound[1].matchId) {
+function checkMatch(obj1, obj2) {
+	if(obj1.matchId === obj2[1].matchId) {
 		return true;
 	}else {
 		return false;
