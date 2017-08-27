@@ -71,23 +71,23 @@ var messagePrompt = "Welcome! Red player starts the game.";
 
 $(document).ready(function(event) {
 	// Set up game
-	setupGame(currentShuffledDeck);
-	console.log(currentShuffledDeck.length);
-
+	currentShuffledDeck = setupGame(currentShuffledDeck);
 	// Displaying cards on page
 	currentShuffledDeck.forEach(function(item, i) {
 		console.log("Next card");
-		var cardDiv = $("<div class='col-xs-4'>")
+		var cardDiv = $("<div class='col-xs-3'>")
 		var card = $("<img class='card'>");
 		card.attr({"src": item.imgSrc, "data-cardIndex" : i});
 		cardDiv.append(card);
-		$("#cardArea").append("cardDiv");
+		$("#cardArea").append(cardDiv);
 	});
 	
 	// On flipping a card
 	$("#cardArea").on("click", ".card", function() {
 		var cardIndex = this.attr("data-cardIndex");
+		console.log(cardIndex);
 		var chosenCardObject = currentShuffledDeck[cardIndex];
+		console.log(chosenCardObject);
 		// handle event card flipped
 		cardFlipped(playerNumber, chosenCardObject);
 		$(".prompts").html(messagePrompt);
@@ -97,8 +97,10 @@ $(document).ready(function(event) {
 function setupGame(deckToBeFilled) {
 	// shuffle cards
 	deckToBeFilled = shuffleCards(cardDeck);
+	console.log(deckToBeFilled);
 	// set player to Red since Red starts the game
 	playerNumber = 1;
+	return deckToBeFilled;
 	// Add CSS for player Red's token
 }
 
