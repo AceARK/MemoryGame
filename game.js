@@ -64,15 +64,26 @@ var scoreBlue = 0;
 var playerNumber;
 var pairOfCardsFlippedInCurrentRound = [];
 var flippedCardsId = [];
-var cardDeck = [];
+// set up card deck of 16 cards in the beginning
+var cardDeck = prepareCardDeck(arrayOfCardObjects);
 var currentShuffledDeck = [];
 var messagePrompt = "Welcome! Red player starts the game.";
 
 $(document).ready(function(event) {
-	// set up card deck of 16 cards in the beginning
-	cardDeck = prepareCardDeck(arrayOfCardObjects);
 	// Set up game
 	setupGame(currentShuffledDeck);
+	console.log(currentShuffledDeck.length);
+
+	// Displaying cards on page
+	currentShuffledDeck.forEach(function(item, i) {
+		console.log("Next card");
+		var cardDiv = $("<div class='col-xs-4'>")
+		var card = $("<img class='card'>");
+		card.attr({"src": item.imgSrc, "data-cardIndex" : i});
+		cardDiv.append(card);
+		$("#cardArea").append("cardDiv");
+	});
+	
 	// On flipping a card
 	$("#cardArea").on("click", ".card", function() {
 		var cardIndex = this.attr("data-cardIndex");
@@ -81,14 +92,11 @@ $(document).ready(function(event) {
 		cardFlipped(playerNumber, chosenCardObject);
 		$(".prompts").html(messagePrompt);
 	});
-}
+});
 
 function setupGame(deckToBeFilled) {
 	// shuffle cards
 	deckToBeFilled = shuffleCards(cardDeck);
-
-	// UI -> display cards onto page now
-
 	// set player to Red since Red starts the game
 	playerNumber = 1;
 	// Add CSS for player Red's token
