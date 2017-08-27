@@ -13,3 +13,14 @@
 	width: 250px;
 	height: 250px;
 }
+
+#endDialogue {
+	border: 3px solid orange;
+	border-radius: 20px;
+	position: absolute;
+	top: 50%;
+	background-color: white;
+	padding: 20px;
+	left: -1%;
+	display: none;
+}

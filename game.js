@@ -74,18 +74,7 @@ $(document).ready(function(event) {
 	// Set up game
 	currentShuffledDeck = setupGame(currentShuffledDeck);
 	// Displaying cards on page
-	currentShuffledDeck.forEach(function(item, i) {
-		console.log("Next card");
-		var cardDiv = $("<div class='cardDiv col-xs-3'>")
-		var card = $("<img class='card'>");
-		card.attr({"src": item.imgSrc, "data-cardIndex" : i});
-		cardDiv.append(card);
-		$("#cardArea").append(cardDiv);
-		// Display card/ hide based on visible attribute in object
-		displayCard(item, card);
-	});
-	// $("#prompts").html(messagePrompt);
-	
+	displayCardsToPlay();
 	// On flipping a card
 	$("#cardArea").on("click", ".cardDiv", function() {
 		console.log($(this));
@@ -104,7 +93,25 @@ $(document).ready(function(event) {
 
 		$(".prompts").html(messagePrompt);
 	});
+
+	// On click of restart button at end of game
+	$("#restart").on("click", function() {
+		resetGame();
+	});
 });
+
+function displayCardsToPlay() {
+	currentShuffledDeck.forEach(function(item, i) {
+		console.log("Next card");
+		var cardDiv = $("<div class='cardDiv col-xs-3'>")
+		var card = $("<img class='card'>");
+		card.attr({"src": item.imgSrc, "data-cardIndex" : i});
+		cardDiv.append(card);
+		$("#cardArea").append(cardDiv);
+		// Display card/ hide based on visible attribute in object
+		displayCard(item, card);
+	});
+}
 
 function setupGame(deckToBeFilled) {
 	// shuffle cards
@@ -166,11 +173,22 @@ function evaluateTurn(cardObj, jqueryObj) {
 				}else {
 					$("#blueStats").html(score);
 				}
-				flipsRemaining = 2;
-				pairOfCardsFlippedInCurrentRound = [];
-				flippedCardjqueryObjectsPerRound = [];
-				messagePrompt = `${getPlayerColor(playerNumber)} - Cards match, you get another round.`;
-				$(".prompts").html(messagePrompt);
+				var visibleCount = 0;
+				currentShuffledDeck.forEach(function(item){
+					if(item.visible) {
+						visibleCount++;
+					}
+				});
+				console.log(visibleCount);
+				if(visibleCount === 16){
+					endGame();
+				}else {
+					flipsRemaining = 2;
+					pairOfCardsFlippedInCurrentRound = [];
+					flippedCardjqueryObjectsPerRound = [];
+					messagePrompt = `${getPlayerColor(playerNumber)} - Cards match, you get another round.`;
+					$(".prompts").html(messagePrompt);
+				}
 			}else {
 				// Ensuring the card is shown before hiding and moving on to next player
 				setTimeout(hideCards, 600);
@@ -242,10 +260,53 @@ function setVisible(cardObj) {
 	cardObj.visible = true;
 }
 
+// increment score after each match
 function incrementScore() {
 	if(playerNumber === 1) {
 		return ++scoreRed;
 	}else {
 		return ++scoreBlue;
 	}
+}
+
+function endGame() {
+	console.log("Entering end game function");
+	$(".cardDiv").attr('disabled', true);
+	messagePrompt = "Game over. All cards matched";
+	if(scoreRed > scoreBlue) {
+		winnerDeclaration = "Red player wins!";
+	}else if(scoreBlue > scoreRed) {
+		winnerDeclaration = "Blue player wins!!";
+	}else if(scoreBlue = scoreRed) {
+		winnerDeclaration = "Both players have equal matches!";
+	}
+	
+	if(scoreBlue !== scoreRed) {
+		$("#differenceInScore").html(Math.abs(scoreBlue - scoreRed));
+		$("#winMessage").html(winnerDeclaration);
+		$("#tieMessage").hide();
+	}else {
+		$("#winMessageAndPoints").hide();
+		$("#tieMessage").html(winnerDeclaration).show();
+	}
+	$("#endDialogue").show();
+}
+
+// Todo
+function resetGame() {
+	$("#cardArea").html("");
+	flipsRemaining = 2;
+	playerNumber = 1;
+	pairOfCardsFlippedInCurrentRound = [];
+	flippedCardjqueryObjectsPerRound = [];
+	currentShuffledDeck = [];
+	cardDeck = [];
+	cardDeck = prepareCardDeck(arrayOfCardObjects);
+	scoreBlue = 0;
+	scoreRed = 0;
+	$("#redStats").html(scoreRed);
+	$("#blueStats").html(scoreBlue);
+	$(".prompts").html("Welcome! Red player starts the game.");
+	currentShuffledDeck = setupGame(currentShuffledDeck);
+	displayCardsToPlay();
 }
