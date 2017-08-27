@@ -68,7 +68,7 @@ var flippedCardsId = [];
 // set up card deck of 16 cards in the beginning
 var cardDeck = prepareCardDeck(arrayOfCardObjects);
 var currentShuffledDeck = [];
-var messagePrompt = "Welcome! Red player starts the game.";
+var messagePrompt = "";
 
 $(document).ready(function(event) {
 	// Set up game
@@ -84,7 +84,7 @@ $(document).ready(function(event) {
 		// Display card/ hide based on visible attribute in object
 		displayCard(item, card);
 	});
-	$("#prompts").html(messagePrompt);
+	// $("#prompts").html(messagePrompt);
 	
 	// On flipping a card
 	$("#cardArea").on("click", ".cardDiv", function() {
@@ -150,30 +150,37 @@ function evaluateTurn(cardObj, jqueryObj) {
 	if(flipsRemaining > 0) {
 		pairOfCardsFlippedInCurrentRound.push(cardObj);
 		flippedCardjqueryObjectsPerRound.push(jqueryObj);
-		// flippedCardsId.push(cardId);
 		messagePrompt = `${getPlayerColor(playerNumber)} - Flip second card.`;
 		--flipsRemaining;
 		console.log(flipsRemaining);
 		if(flipsRemaining === 0) {
 			if(checkMatch(pairOfCardsFlippedInCurrentRound[0], pairOfCardsFlippedInCurrentRound[1])) {
-
+				// Make sure both cards stay open by setting both objects' flags to visible
 				pairOfCardsFlippedInCurrentRound.forEach(function(item, i) {
 					setVisible(item);
 					displayCard(item, flippedCardjqueryObjectsPerRound[i]);
 				});
+				var score = incrementScore();
+				if(playerNumber === 1) {
+					$("#redStats").html(score);
+				}else {
+					$("#blueStats").html(score);
+				}
 				flipsRemaining = 2;
 				pairOfCardsFlippedInCurrentRound = [];
 				flippedCardjqueryObjectsPerRound = [];
 				messagePrompt = `${getPlayerColor(playerNumber)} - Cards match, you get another round.`;
 				$(".prompts").html(messagePrompt);
 			}else {
-				setTimeout(hideCards, 500);
+				// Ensuring the card is shown before hiding and moving on to next player
+				setTimeout(hideCards, 600);
 			}
 		}
 		return messagePrompt;
 	}
 }
 
+// function to hide cards after mismatch and move to next player - created in order to incorporate a delay
 function hideCards() {
 	console.log("Else condition of checkMatch in Evaluate turns");
 	pairOfCardsFlippedInCurrentRound.forEach(function(item, i) {
@@ -187,6 +194,7 @@ function hideCards() {
 	togglePlayer();
 }
 
+// check if both cards match
 function checkMatch(obj1, obj2) {
 	if(obj1.matchId === obj2.matchId) {
 		console.log("cards in checkMatch match.");
@@ -197,6 +205,7 @@ function checkMatch(obj1, obj2) {
 	}
 }
 
+// get color from playerNumber for displaying prompts
 function getPlayerColor(playerNumber) {
 	if(playerNumber === 1) {
 		return "Red";
@@ -205,6 +214,7 @@ function getPlayerColor(playerNumber) {
 	}
 }
 
+// get next player, and set the stage for their round
 function togglePlayer() {
 	if(playerNumber === 1) {
 		playerNumber = 2;
@@ -218,6 +228,7 @@ function togglePlayer() {
 	$(".prompts").html(messagePrompt);
 }
 
+// hide or show a card based on visible flag in object
 function displayCard(cardObj, jqueryObj) {
 	if(!cardObj.visible) {
 		jqueryObj.hide();
@@ -226,6 +237,15 @@ function displayCard(cardObj, jqueryObj) {
 	}
 }
 
+// set card object property to visible
 function setVisible(cardObj) {
 	cardObj.visible = true;
+}
+
+function incrementScore() {
+	if(playerNumber === 1) {
+		return ++scoreRed;
+	}else {
+		return ++scoreBlue;
+	}
 }

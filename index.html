@@ -15,10 +15,14 @@
 <body>
 	<div class="container">
 		<!-- Title -->
-		<div class="col-xs-12" id="heading">Memory Game</div>
+		<div class="col-xs-12" id="heading">
+			<h1 class="text-center" id="title">Memory Game</h1>
+		</div>
 		
 		<!-- Instructions -->
-		<div class="col-xs-8 col-xs-offset-2 prompts"></div>
+		<div class="col-xs-8 col-xs-offset-2">
+			<h4 class="prompts text-center">Welcome! Red player starts the game.</h4>
+		</div>
 		
 		<!-- Game cards -->
 		<div class="col-xs-12" id="cardArea"></div>
@@ -26,12 +30,18 @@
 		<!-- Player area with player stats -->
 		<div class="col-xs-12" id="playerArea">
 			<div class="col-xs-6" id="blue">
+				<h3 class="playerIdentity">Blue player</h3>
 				<!-- Blue token pic -->
-				<div class="col-xs-12 stats" id="blueStats"></div>
+				<div class="col-xs-12 stats">
+					<h3 class="playerStat">Score: <span id="blueStats"></span></h3>
+				</div>
 			</div>
 			<div class="col-xs-6" id="red">
+				<h3 class="playerIdentity">Red player</h3>
 				<!-- Red token pic -->
-				<div class="col-xs-12 stats" id="redStats"></div>
+				<div class="col-xs-12 stats">
+					<h3 class="playerStat">Score: <span id="redStats"></span></h3>
+				</div>
 			</div>
 		</div>
 	</div>
