@@ -156,7 +156,14 @@ function evaluateTurn(cardObj, jqueryObj) {
 		console.log(flipsRemaining);
 		if(flipsRemaining === 0) {
 			if(checkMatch(pairOfCardsFlippedInCurrentRound[0], pairOfCardsFlippedInCurrentRound[1])) {
+
+				pairOfCardsFlippedInCurrentRound.forEach(function(item, i) {
+					setVisible(item);
+					displayCard(item, flippedCardjqueryObjectsPerRound[i]);
+				});
 				flipsRemaining = 2;
+				pairOfCardsFlippedInCurrentRound = [];
+				flippedCardjqueryObjectsPerRound = [];
 				messagePrompt = `${getPlayerColor(playerNumber)} - Cards match, you get another round.`;
 				$(".prompts").html(messagePrompt);
 			}else {
@@ -217,4 +224,8 @@ function displayCard(cardObj, jqueryObj) {
 	}else {
 		jqueryObj.show();
 	}
+}
+
+function setVisible(cardObj) {
+	cardObj.visible = true;
 }
