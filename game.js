@@ -16,42 +16,165 @@
 // 4. If all cards matched, check player scores and declare winner. 
 //    Show Restart or Exit button. If Restart, Go to step 1, else, Exit.
   
-var arrayOfCardObjects = ["https://i.pinimg.com/originals/de/1b/0c/de1b0cc0ea3ae52e6bec6a77006c0fb3.jpg", "http://cdn2-www.dogtime.com/assets/uploads/gallery/30-impossibly-cute-puppies/impossibly-cute-puppy-8.jpg", "http://i.dailymail.co.uk/i/pix/2016/02/05/10/30E6DFAA00000578-0-image-a-74_1454669834974.jpg", "https://static.pexels.com/photos/9264/bird-water-summer-sun.jpg", "http://orig10.deviantart.net/9893/f/2014/309/4/6/cute_fox_cub_by_thrumyeye-d85cjz2.jpg", "https://www.saczoo.org/wp-content/uploads/2017/03/Lion-Cubs-6Jan15-Credit-Erik-Bowker-31-760x456.jpg", "http://www.zooborns.com/.a/6a010535647bf3970b0133f3202a82970b-pi", "https://s-media-cache-ak0.pinimg.com/236x/fb/24/23/fb24234de5ac249f8fbdcfb40429c853--wolf-puppies-baby-wolves.jpg"];
+var arrayOfCardObjects = [
+	{
+		"matchId" : "1",
+		"imgSrc" : "https://i.pinimg.com/originals/de/1b/0c/de1b0cc0ea3ae52e6bec6a77006c0fb3.jpg",
+		"flipped" : "false"
+	},
+	{
+		"matchId" : "2",
+		"imgSrc" : "http://cdn2-www.dogtime.com/assets/uploads/gallery/30-impossibly-cute-puppies/impossibly-cute-puppy-8.jpg",
+		"flipped" : "false"
+	},
+	{
+		"matchId" : "3",
+		"imgSrc" : "http://i.dailymail.co.uk/i/pix/2016/02/05/10/30E6DFAA00000578-0-image-a-74_1454669834974.jpg",
+		"flipped" : "false"
+	},
+	{
+		"matchId" : "4",
+		"imgSrc" : "https://static.pexels.com/photos/9264/bird-water-summer-sun.jpg",
+		"flipped" : "false"
+	},
+	{
+		"matchId" : "5",
+		"imgSrc" : "http://orig10.deviantart.net/9893/f/2014/309/4/6/cute_fox_cub_by_thrumyeye-d85cjz2.jpg",
+		"flipped" : "false"
+	},
+	{
+		"matchId" : "6",
+		"imgSrc" : "https://www.saczoo.org/wp-content/uploads/2017/03/Lion-Cubs-6Jan15-Credit-Erik-Bowker-31-760x456.jpg",
+		"flipped" : "false"
+	},
+	{
+		"matchId" : "7",
+		"imgSrc" : "http://www.zooborns.com/.a/6a010535647bf3970b0133f3202a82970b-pi",
+		"flipped" : "false"
+	},
+	{
+		"matchId" : "8",
+		"imgSrc" : "https://s-media-cache-ak0.pinimg.com/236x/fb/24/23/fb24234de5ac249f8fbdcfb40429c853--wolf-puppies-baby-wolves.jpg",
+		"flipped" : "false"
+	}
+];
 var turns = 2;
 var scoreRed = 0;
 var scoreBlue = 0;
 var playerNumber;
-var flippedCardsArray = [];
+var pairOfCardsFlippedInCurrentRound = [];
+var flippedCardsId = [];
+var cardDeck = [];
+var currentShuffledDeck = [];
+var messagePrompt = "Welcome! Red player starts the game.";
 
 $(document).ready(function(event) {
+	// set up card deck of 16 cards in the beginning
+	cardDeck = prepareCardDeck(arrayOfCardObjects);
 	// Set up game
-	setupGame();
+	setupGame(currentShuffledDeck);
+	// On flipping a card
 	$("#cardArea").on("click", ".card", function() {
-		// Show card
-		var cardId = this.attr("data-id");
-		flippedCardsArray.push(cardId);
+		var cardIndex = this.attr("data-cardIndex");
+		var chosenCardObject = currentShuffledDeck[cardIndex];
+		// handle event card flipped
+		cardFlipped(playerNumber, chosenCardObject);
+		$(".prompts").html(messagePrompt);
 	});
 }
 
-function setupGame() {
-	shuffleCards();
-	// set player to Red 
+function setupGame(deckToBeFilled) {
+	// shuffle cards
+	deckToBeFilled = shuffleCards(cardDeck);
+
+	// UI -> display cards onto page now
+
+	// set player to Red since Red starts the game
 	playerNumber = 1;
 	// Add CSS for player Red's token
 }
 
-function checkMatch() {
+// function to create pairs of each card object
+function prepareCardDeck(inputArray) {
+	var arrayOfAllCards = [];
+	var arrayIndex = 0;
+	inputArray.forEach(function(item) {
+		// inserting each card object twice into array i.e. making pairs ready to shuffle
+		for(var i=1; i<3; i++) {
+			arrayOfAllCards.push(item);
+		}
+	});
+	// end result - an array of card objects each repeated once
+	console.log(arrayOfAllCards);
+	return arrayOfAllCards;
+}
 
+// function to shuffle an array
+function shuffleCards(inputArray) {
+	for(var i=inputArray.length-1; i>0; i--) {
+		var randomIndex = Math.floor(Math.random() * i);
+		var currentItemAtRandomIndex = inputArray[randomIndex];
+		inputArray[randomIndex] = inputArray[i];
+		inputArray[i] = currentItemAtRandomIndex;
+	}
+	// return shuffled array
+	return inputArray;
+}
+
+function flipCard(cardObject) {
+	cardObject.flipped = !cardObject.flipped;
+}
+
+function cardFlipped(number, cardObject) {
+	// Show card
+	flipCard(cardObject);
+
+	// Logic for flipped card
+	if(turns != 0) {
+		pairOfCardsFlippedInCurrentRound.push(cardObject);
+		// flippedCardsId.push(cardId);
+		turns--;
+		messagePrompt = `${getPlayerColor(number)} - Flip second card.`;
+		return messagePrompt;
+	}else {
+		if(checkMatch()) {
+			turns = 2;
+			messagePrompt = `${getPlayerColor(number)} - Cards match, you get another round.`
+		}else {
+			// Hide both cards again
+			pairOfCardsFlippedInCurrentRound.forEach(function(item) {
+				flipcard(item);
+			});
+			// current player's round has ended
+			togglePlayer();
+		}
+	}
+}
+
+
+function checkMatch() {
+	if(pairOfCardsFlippedInCurrentRound[0].matchId === pairOfCardsFlippedInCurrentRound[1].matchId) {
+		return true;
+	}else {
+		return false;
+	}
+}
+
+function getPlayerColor(playerNumber) {
+	if(playerNumber === 1) {
+		return "Red";
+	}else {
+		return "Blue";
+	}
 }
 
 function togglePlayer() {
-
-}
-
-function cardFlipped() {
-
-}
-
-function shuffleCards() {
-
+	if(playerNumber === 1) {
+		playerNumber = 2;
+	}else {
+		playerNumber = 1;
+	}
+	turns = 2;
+	pairOfCardsFlippedInCurrentRound = [];
+	messagePrompt = `${getPlayerColor(playerNumber)}'s turn to play. Flip first card.`
 }
