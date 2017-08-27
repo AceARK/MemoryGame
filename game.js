@@ -2,15 +2,15 @@
 
 // 1. Create pairs of cards and shuffle them. Place on board face-down (overlay image). 
 //    Set up players - Red and Blue. Set up stats with score 0. 
-//    Highlight the Red player to start first. Turns = 2.
+//    Highlight the Red player to start first. flipsRemaining = 2.
 
-// 2. When Red flips a card, turns = 1, show card (discard overlay). Note card data-id. 
+// 2. When Red flips a card, flipsRemaining = 1, show card (discard overlay). Note card data-id. 
 //    Prompt player to pick another.
-//    When turns = 0, go to next step - checking match.
+//    When flipsRemaining = 0, go to next step - checking match.
 
 // 3. Compare data-id of both cards. 
-//    If same, increment score of Red. Check if all cards matched (if yes, got to step 4). If not, Set turns = 2. Prompt Red to play again.
-//    If not same, toggle player to Blue. Set turns = 2. Prompt Blue to play.
+//    If same, increment score of Red. Check if all cards matched (if yes, got to step 4). If not, Set flipsRemaining = 2. Prompt Red to play again.
+//    If not same, toggle player to Blue. Set flipsRemaining = 2. Prompt Blue to play.
 //    Follow step 2. 
 
 // 4. If all cards matched, check player scores and declare winner. 
@@ -20,49 +20,50 @@ var arrayOfCardObjects = [
 	{
 		"matchId" : "1",
 		"imgSrc" : "https://i.pinimg.com/originals/de/1b/0c/de1b0cc0ea3ae52e6bec6a77006c0fb3.jpg",
-		"flipped" : false
+		"visible" : false
 	},
 	{
 		"matchId" : "2",
 		"imgSrc" : "http://cdn2-www.dogtime.com/assets/uploads/gallery/30-impossibly-cute-puppies/impossibly-cute-puppy-8.jpg",
-		"flipped" : false
+		"visible" : false
 	},
 	{
 		"matchId" : "3",
 		"imgSrc" : "http://i.dailymail.co.uk/i/pix/2016/02/05/10/30E6DFAA00000578-0-image-a-74_1454669834974.jpg",
-		"flipped" : false
+		"visible" : false
 	},
 	{
 		"matchId" : "4",
 		"imgSrc" : "https://static.pexels.com/photos/9264/bird-water-summer-sun.jpg",
-		"flipped" : false
+		"visible" : false
 	},
 	{
 		"matchId" : "5",
 		"imgSrc" : "http://orig10.deviantart.net/9893/f/2014/309/4/6/cute_fox_cub_by_thrumyeye-d85cjz2.jpg",
-		"flipped" : false
+		"visible" : false
 	},
 	{
 		"matchId" : "6",
 		"imgSrc" : "https://www.saczoo.org/wp-content/uploads/2017/03/Lion-Cubs-6Jan15-Credit-Erik-Bowker-31-760x456.jpg",
-		"flipped" : false
+		"visible" : false
 	},
 	{
 		"matchId" : "7",
 		"imgSrc" : "http://www.zooborns.com/.a/6a010535647bf3970b0133f3202a82970b-pi",
-		"flipped" : false
+		"visible" : false
 	},
 	{
 		"matchId" : "8",
 		"imgSrc" : "https://s-media-cache-ak0.pinimg.com/236x/fb/24/23/fb24234de5ac249f8fbdcfb40429c853--wolf-puppies-baby-wolves.jpg",
-		"flipped" : false
+		"visible" : false
 	}
 ];
-var turns = 2;
+var flipsRemaining = 2;
 var scoreRed = 0;
 var scoreBlue = 0;
 var playerNumber;
 var pairOfCardsFlippedInCurrentRound = [];
+var flippedCardjqueryObjectsPerRound = [];
 var flippedCardsId = [];
 // set up card deck of 16 cards in the beginning
 var cardDeck = prepareCardDeck(arrayOfCardObjects);
@@ -75,21 +76,32 @@ $(document).ready(function(event) {
 	// Displaying cards on page
 	currentShuffledDeck.forEach(function(item, i) {
 		console.log("Next card");
-		var cardDiv = $("<div class='col-xs-3'>")
+		var cardDiv = $("<div class='cardDiv col-xs-3'>")
 		var card = $("<img class='card'>");
 		card.attr({"src": item.imgSrc, "data-cardIndex" : i});
 		cardDiv.append(card);
 		$("#cardArea").append(cardDiv);
+		// Display card/ hide based on visible attribute in object
+		displayCard(item, card);
 	});
+	$("#prompts").html(messagePrompt);
 	
 	// On flipping a card
-	$("#cardArea").on("click", ".card", function() {
-		var cardIndex = this.attr("data-cardIndex");
+	$("#cardArea").on("click", ".cardDiv", function() {
+		console.log($(this));
+		var cardIndex = $(this).children(".card").attr("data-cardIndex");
+		var jqueryCardObj = $(this).children(".card");
 		console.log(cardIndex);
 		var chosenCardObject = currentShuffledDeck[cardIndex];
 		console.log(chosenCardObject);
-		// handle event card flipped
-		cardFlipped(playerNumber, chosenCardObject);
+		// flip card and display it
+		flipCard(chosenCardObject);
+		console.log(chosenCardObject);
+		displayCard(chosenCardObject, jqueryCardObj);
+		console.log(chosenCardObject);
+		// // handle event card flipped
+		evaluateTurn(chosenCardObject, jqueryCardObj);
+
 		$(".prompts").html(messagePrompt);
 	});
 });
@@ -97,7 +109,6 @@ $(document).ready(function(event) {
 function setupGame(deckToBeFilled) {
 	// shuffle cards
 	deckToBeFilled = shuffleCards(cardDeck);
-	console.log(deckToBeFilled);
 	// set player to Red since Red starts the game
 	playerNumber = 1;
 	return deckToBeFilled;
@@ -110,12 +121,10 @@ function prepareCardDeck(inputArray) {
 	var arrayIndex = 0;
 	inputArray.forEach(function(item) {
 		// inserting each card object twice into array i.e. making pairs ready to shuffle
-		for(var i=1; i<3; i++) {
-			arrayOfAllCards.push(item);
-		}
+		arrayOfAllCards.push(item);
+		arrayOfAllCards.push(item);
 	});
 	// end result - an array of card objects each repeated once
-	console.log(arrayOfAllCards);
 	return arrayOfAllCards;
 }
 
@@ -132,40 +141,51 @@ function shuffleCards(inputArray) {
 }
 
 function flipCard(cardObject) {
-	cardObject.flipped = !cardObject.flipped;
+	cardObject.visible = !cardObject.visible;
 }
 
-function cardFlipped(number, cardObject) {
-	// Show card
-	flipCard(cardObject);
-
+function evaluateTurn(cardObj, jqueryObj) {
+	console.log(flipsRemaining);
 	// Logic for flipped card
-	if(turns != 0) {
-		pairOfCardsFlippedInCurrentRound.push(cardObject);
+	if(flipsRemaining > 0) {
+		pairOfCardsFlippedInCurrentRound.push(cardObj);
+		flippedCardjqueryObjectsPerRound.push(jqueryObj);
 		// flippedCardsId.push(cardId);
-		turns--;
-		messagePrompt = `${getPlayerColor(number)} - Flip second card.`;
-		return messagePrompt;
-	}else {
-		if(checkMatch(pairOfCardsFlippedInCurrentRound[0], pairOfCardsFlippedInCurrentRound[1])) {
-			turns = 2;
-			messagePrompt = `${getPlayerColor(number)} - Cards match, you get another round.`
-		}else {
-			// Hide both cards again
-			pairOfCardsFlippedInCurrentRound.forEach(function(item) {
-				flipcard(item);
-			});
-			// current player's round has ended
-			togglePlayer();
+		messagePrompt = `${getPlayerColor(playerNumber)} - Flip second card.`;
+		--flipsRemaining;
+		console.log(flipsRemaining);
+		if(flipsRemaining === 0) {
+			if(checkMatch(pairOfCardsFlippedInCurrentRound[0], pairOfCardsFlippedInCurrentRound[1])) {
+				flipsRemaining = 2;
+				messagePrompt = `${getPlayerColor(playerNumber)} - Cards match, you get another round.`;
+				$(".prompts").html(messagePrompt);
+			}else {
+				setTimeout(hideCards, 500);
+			}
 		}
+		return messagePrompt;
 	}
 }
 
+function hideCards() {
+	console.log("Else condition of checkMatch in Evaluate turns");
+	pairOfCardsFlippedInCurrentRound.forEach(function(item, i) {
+		console.log("flipping both open cards");
+		flipCard(item);
+		console.log(item);
+		displayCard(item, flippedCardjqueryObjectsPerRound[i]);
+		console.log(item);
+	});
+	// current player's round has ended
+	togglePlayer();
+}
 
 function checkMatch(obj1, obj2) {
-	if(obj1.matchId === obj2[1].matchId) {
+	if(obj1.matchId === obj2.matchId) {
+		console.log("cards in checkMatch match.");
 		return true;
 	}else {
+		console.log("cards in checkMatch do not match.");
 		return false;
 	}
 }
@@ -184,7 +204,17 @@ function togglePlayer() {
 	}else {
 		playerNumber = 1;
 	}
-	turns = 2;
+	flipsRemaining = 2;
 	pairOfCardsFlippedInCurrentRound = [];
-	messagePrompt = `${getPlayerColor(playerNumber)}'s turn to play. Flip first card.`
+	flippedCardjqueryObjectsPerRound = [];
+	messagePrompt = `${getPlayerColor(playerNumber)}'s turn to play. Flip first card.`;
+	$(".prompts").html(messagePrompt);
+}
+
+function displayCard(cardObj, jqueryObj) {
+	if(!cardObj.visible) {
+		jqueryObj.hide();
+	}else {
+		jqueryObj.show();
+	}
 }

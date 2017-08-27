@@ -3,6 +3,13 @@
 }
 
 .card {
-	width: 300px;
-	height: 300px;
+	width: 200px;
+	height: 200px;
+	}
+
+.cardDiv {
+	margin: 5px;
+	border: 5px solid black;
+	width: 250px;
+	height: 250px;
 }
