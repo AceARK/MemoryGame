@@ -87,6 +87,11 @@ $(document).ready(function(event) {
 	$("#restart").on("click", function() {
 		resetGame();
 	});
+
+	// Exit button click
+	$("#exit").on("click", function() {
+		window.close();
+	});
 });
 
 function displayCardsToPlay() {
@@ -304,7 +309,7 @@ function resetGame() {
 	arrayOfCardObjects.forEach(function(item) {
 		setVisible(item, false);
 	});
-	cardDeck = [];
+	cardDeck = [];  
 	cardDeck = prepareCardDeck(arrayOfCardObjects);
 	$("#redStats").html(scoreRed);
 	$("#blueStats").html(scoreBlue);
