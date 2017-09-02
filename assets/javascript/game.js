@@ -94,6 +94,7 @@ $(document).ready(function(event) {
 	});
 });
 
+// function that lays out the UI i.e. cards onto the page
 function displayCardsToPlay() {
 	currentShuffledDeck.forEach(function(item, i) {
 		console.log("Next card");
@@ -107,6 +108,7 @@ function displayCardsToPlay() {
 	});
 }
 
+// Call shuffle function, set player to Red and return the 16-card deck
 function setupGame(deckToBeFilled) {
 	// shuffle cards
 	deckToBeFilled = shuffleCards(cardDeck);
@@ -141,10 +143,12 @@ function shuffleCards(inputArray) {
 	return inputArray;
 }
 
+// Generic function to show/hide object based on what it was initially
 function flipCard(cardObject) {
 	cardObject.visible = !cardObject.visible;
 }
 
+// function containing main game logic to assess match or not
 function evaluateTurn(cardObj, jqueryObj) {
 	console.log(flipsRemaining);
 	// Logic for flipped card
@@ -181,7 +185,7 @@ function evaluateTurn(cardObj, jqueryObj) {
 				if(visibleCount === 16){
 					endGame();
 				}else {
-					// resuming card's clickabilities
+					// resuming card's click-abilities
 					$(".cardDiv").css('pointer-events', 'auto');
 					flipsRemaining = 2;
 					pairOfCardsFlippedInCurrentRound = [];
@@ -272,6 +276,7 @@ function incrementScore() {
 	}
 }
 
+// Calculate scores, display messages, show end message
 function endGame() {
 	console.log("Entering end game function");
 	// disable clicking any more cards when game has ended
